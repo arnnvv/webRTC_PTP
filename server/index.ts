@@ -1,8 +1,7 @@
 import { Server, Socket } from "socket.io";
-import express from "express";
 import http from "http";
+import UserManager from "./managers/UserManger.ts";
 
-const app = express();
 const server = http.createServer(http);
 const port: number = 3000;
 
@@ -12,8 +11,15 @@ const io = new Server(server, {
   },
 });
 
+const userManager = new UserManager();
+
 io.on("connection", (socket: Socket) => {
   console.log("a user connected");
+  userManager.addUser("randomName", socket);
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+    userManager.removeUser(socket.id);
+  });
 });
 
 server.listen(port, () => {

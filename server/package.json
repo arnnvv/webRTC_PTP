@@ -7,5 +7,10 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.4",
+    "socket.io-adapter": "^2.5.2",
+    "socket.io-client": "^4.7.4"
   }
 }

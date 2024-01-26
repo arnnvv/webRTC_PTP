@@ -1,16 +1,15 @@
 import { Socket } from "socket.io";
-import { RoomMAnager } from "./RoomManager.ts";
-let GLOBAL_ROOM_ID: number = 1;
+import RoomManager from "./RoomManager.ts";
 
 export interface User {
   socket: Socket;
   name: string;
 }
 
-export class UserManager {
+class UserManager {
   private users: User[] = [];
   private queue: string[] = [];
-  private RoomManager: RoomMAnager = new RoomMAnager();
+  private roomManager: RoomManager = new RoomManager();
 
   addUser(name: string, socket: Socket) {
     this.users.push({ name, socket });
@@ -35,16 +34,16 @@ export class UserManager {
     );
     if (!user1 || !user2) return;
 
-    const room = this.RoomManager.createRoom(user1, user2);
+    this.roomManager.createRoom(user1, user2);
     this.clearQueue();
   }
 
   initHandlers(socket: Socket) {
     socket.on("offer", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
-      this.RoomManager.onOffer(roomId, sdp, socket.id);
+      this.roomManager.onOffer(roomId, sdp, socket.id);
     });
     socket.on("answer", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
-      this.RoomManager.onAnswer(roomId, sdp, socket.id);
+      this.roomManager.onAnswer(roomId, sdp, socket.id);
     });
     socket.on(
       "ice-candidate",
@@ -57,8 +56,10 @@ export class UserManager {
         roomId: string;
         type: "sender" | "receiver";
       }) => {
-        this.RoomManager.onIceCandidate(roomId, candidate, socket.id, type);
+        this.roomManager.onIceCandidate(roomId, candidate, socket.id, type);
       },
     );
   }
 }
+
+export default UserManager;

@@ -5,7 +5,7 @@ interface Room {
   user1: User;
   user2: User;
 }
-export class RoomMAnager {
+class RoomManager {
   private rooms: Map<string, Room> = new Map<string, Room>();
   createRoom(user1: User, user2: User) {
     const roomId = this.generate().toString();
@@ -61,3 +61,5 @@ export class RoomMAnager {
     return GLOBAL_ROOM_ID++;
   }
 }
+
+export default RoomManager;
