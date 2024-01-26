@@ -44,6 +44,19 @@ export class RoomMAnager {
     });
   }
 
+  onIceCandidate(
+    roomId: string,
+    candidate: any,
+    senderSocketId: string,
+    type: "sender" | "receiver",
+  ) {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    const receivingUser =
+      room.user1.socket.id === senderSocketId ? room.user2 : room.user1;
+    receivingUser?.socket.emit("ice-candidate", { candidate, type });
+  }
+
   generate() {
     return GLOBAL_ROOM_ID++;
   }
