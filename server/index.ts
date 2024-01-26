@@ -12,6 +12,10 @@ const io = new Server(server, {
   },
 });
 
+io.on("connection", (socket: Socket) => {
+  console.log("a user connected");
+});
+
 server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
