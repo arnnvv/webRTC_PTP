@@ -1,5 +1,7 @@
 import { Socket } from "socket.io";
 
+let GLOBAL_ROOM_ID: number = 1;
+
 export interface User {
   socket: Socket;
   name: string;
@@ -29,5 +31,16 @@ export class UserManager {
       (user) => user.socket.id === this.queue.pop(),
     );
     if (!user1 || !user2) return;
+
+    const roomId = this.generate();
+    user1.socket.emit(`new-room`, {
+      type: `send-offer`,
+      room: this.generate(),
+      roomId,
+    });
+  }
+
+  generate() {
+    return GLOBAL_ROOM_ID++;
   }
 }
