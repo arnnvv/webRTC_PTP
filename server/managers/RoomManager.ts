@@ -33,6 +33,17 @@ export class RoomMAnager {
     });
   }
 
+  onAnswer(roomId: string, sdp: string, senderSocketId: string) {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    const receivingUser =
+      senderSocketId === room.user1.socket.id ? room.user2 : room.user1;
+    receivingUser?.socket.emit("answer", {
+      sdp,
+      roomId,
+    });
+  }
+
   generate() {
     return GLOBAL_ROOM_ID++;
   }

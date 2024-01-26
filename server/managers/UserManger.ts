@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-
+import { RoomMAnager } from "./RoomManager.ts";
 let GLOBAL_ROOM_ID: number = 1;
 
 export interface User {
@@ -10,6 +10,7 @@ export interface User {
 export class UserManager {
   private users: User[] = [];
   private queue: string[] = [];
+  private RoomManager: RoomMAnager = new RoomMAnager();
 
   addUser(name: string, socket: Socket) {
     this.users.push({ name, socket });
@@ -18,6 +19,8 @@ export class UserManager {
   }
 
   removeUser(socketId: string) {
+    const user = this.users.find((x) => x.socket.id === socketId);
+
     this.users = this.users.filter((user) => user.socket.id !== socketId);
     this.queue = this.queue.filter((id) => id === socketId);
   }
@@ -32,15 +35,16 @@ export class UserManager {
     );
     if (!user1 || !user2) return;
 
-    const roomId = this.generate();
-    user1.socket.emit(`new-room`, {
-      type: `send-offer`,
-      room: this.generate(),
-      roomId,
-    });
+    const room = this.RoomManager.createRoom(user1, user2);
+    this.clearQueue();
   }
 
-  generate() {
-    return GLOBAL_ROOM_ID++;
+  initHandlers(socket: Socket) {
+    socket.on("offer", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
+      this.RoomManager.onOffer(roomId, sdp, socket.id);
+    });
+    socket.on("answer", ({ sdp, roomId }: { sdp: string; roomId: string }) => {
+      this.RoomManager.onAnswer(roomId, sdp, socket.id);
+    });
   }
 }
