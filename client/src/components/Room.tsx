@@ -31,21 +31,32 @@ const Room = () => {
   useEffect(() => {
     const socket: Socket = io(URL);
     socket.on("send-offer", async ({ roomId }) => {
-      alert(`Send Offer Plz`);
       setLobby(false);
       const pc = new RTCPeerConnection();
       setSendingPc(pc);
+      const sdp = await pc.createOffer();
       socket.emit("offer", {
-        sdp: "",
+        sdp,
         roomId,
       });
     });
 
-    socket.on("offer", ({ roomId, offer }) => {
-      alert(`Send Answer Plz`);
+    socket.on("offer", async ({ roomId, offer }) => {
+      setLobby(false);
+      const pc = new RTCPeerConnection();
+      pc.setRemoteDescription({ sdp: offer, type: "offer" });
+      const sdp = await pc.createAnswer();
+      setReceivingPc(pc);
+      pc.ontrack = ({ track, type }) => {
+        if (type === "video") {
+          setRemoteVideoTrack(track);
+        } else if (type === "audio") {
+          setRemoteAudioTrack(track);
+        }
+      };
       socket.emit("answer", {
         roomId,
-        sdp: "",
+        sdp,
       });
     });
 
