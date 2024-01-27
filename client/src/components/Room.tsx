@@ -13,7 +13,15 @@ import { useEffect, useRef } from "react";
 import { Socket, io } from "socket.io-client";
 
 const URL: string = "http://localhost:3000";
-const Room = () => {
+const Room = ({
+  name,
+  localAudioTrack,
+  localVideoTrack,
+}: {
+  name: string;
+  localAudioTrack: MediaStreamTrack | null;
+  localVideoTrack: MediaStreamTrack | null;
+}) => {
   const name = useRecoilState(nameAtom);
   const [setSocket] = useRecoilState(socketAtom);
   const [lobby, setLobby] = useRecoilState(lobbyAtom);

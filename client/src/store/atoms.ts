@@ -45,3 +45,13 @@ export const joinedLobbyAtom = atom({
   key: "joinedLobbyAtom",
   default: false,
 });
+
+export const localAudioTrackAtom = atom<MediaStreamTrack | null>({
+  key: "localAudioTrackAtom",
+  default: null,
+});
+
+export const localVideoTrackAtom = atom<MediaStreamTrack | null>({
+  key: "localVideoTrackAtom",
+  default: null,
+});
