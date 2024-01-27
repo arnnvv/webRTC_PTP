@@ -14,7 +14,9 @@ class UserManager {
   addUser(name: string, socket: Socket) {
     this.users.push({ name, socket });
     this.queue.push(socket.id);
+    socket.emit("lobby");
     this.clearQueue();
+    this.initHandlers(socket);
   }
 
   removeUser(socketId: string) {
@@ -46,7 +48,7 @@ class UserManager {
       this.roomManager.onAnswer(roomId, sdp, socket.id);
     });
     socket.on(
-      "ice-candidate",
+      "add-ice-candidate",
       ({
         candidate,
         roomId,

@@ -9,7 +9,7 @@ class RoomManager {
   private rooms: Map<string, Room> = new Map<string, Room>();
   createRoom(user1: User, user2: User) {
     const roomId = this.generate().toString();
-    this.rooms.set(roomId, {
+    this.rooms.set(roomId.toString(), {
       user1,
       user2,
     });
@@ -54,7 +54,7 @@ class RoomManager {
     if (!room) return;
     const receivingUser =
       room.user1.socket.id === senderSocketId ? room.user2 : room.user1;
-    receivingUser?.socket.emit("ice-candidate", { candidate, type });
+    receivingUser?.socket.emit("add-ice-candidate", { candidate, type });
   }
 
   generate() {

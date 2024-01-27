@@ -6,7 +6,6 @@ import {
   localAudioTrackAtom,
   localVideoTrackAtom,
 } from "../store/atoms";
-import { useNavigate } from "react-router-dom";
 const Room = lazy(() => import("./Room.tsx"));
 
 const Landing = () => {
@@ -17,7 +16,6 @@ const Landing = () => {
   const [localVideoTrack, setLocalVideoTrack] =
     useRecoilState(localVideoTrackAtom);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const navigate = useNavigate();
 
   const getCam = async () => {
     const stream = await window.navigator.mediaDevices.getUserMedia({

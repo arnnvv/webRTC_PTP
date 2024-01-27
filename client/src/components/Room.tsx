@@ -1,5 +1,4 @@
 import {
-  nameAtom,
   socketAtom,
   lobbyAtom,
   sendingPcAtom,
@@ -22,7 +21,6 @@ const Room = ({
   localAudioTrack: MediaStreamTrack | null;
   localVideoTrack: MediaStreamTrack | null;
 }) => {
-  const name = useRecoilState(nameAtom);
   const [setSocket] = useRecoilState(socketAtom);
   const [lobby, setLobby] = useRecoilState(lobbyAtom);
   const [sendingPc, setSendingPc] = useRecoilState(sendingPcAtom);
@@ -36,6 +34,7 @@ const Room = ({
   );
   const remoteVideoRef = useRef<HTMLVideoElement>();
   const localVideoRef = useRef<HTMLVideoElement>();
+
   useEffect(() => {
     const socket: Socket = io(URL);
     socket.on("send-offer", async ({ roomId }) => {
@@ -49,6 +48,7 @@ const Room = ({
           socket.emit("add-ice-candidate", {
             candidate: e.candidate,
             type: "sender",
+            roomId,
           });
       };
 
@@ -73,27 +73,69 @@ const Room = ({
       setRemoteMediaStream(stream);
 
       setReceivingPc(pc);
+      //ice
+      window.pcr = pc;
+      pc.ontrack = () => {
+        alert("ontrack");
+        // console.error("inside ontrack");
+        // const {track, type} = e;
+        // if (type == 'audio') {
+        //     // setRemoteAudioTrack(track);
+        //     // @ts-ignore
+        //     remoteVideoRef.current.srcObject.addTrack(track)
+        // } else {
+        //     // setRemoteVideoTrack(track);
+        //     // @ts-ignore
+        //     remoteVideoRef.current.srcObject.addTrack(track)
+        // }
+        // //@ts-ignore
+        // remoteVideoRef.current.play();
+      };
+
       pc.onicecandidate = async (e) => {
+        if (!e.candidate) return;
         if (e.candidate) {
           socket.emit("add-ice-candidate", {
             candidate: e.candidate,
             type: "receiver",
+            roomId,
           });
         }
       };
 
-      pc.ontrack = ({ track, type }) => {
-        if (type === "video") {
-          remoteVideoRef.current?.srcObject?.addTrack(track);
-        } else if (type === "audio") {
-          remoteVideoRef.current?.srcObject?.addTrack(track);
-        }
-        remoteVideoRef.current?.play();
-      };
       socket.emit("answer", {
         roomId,
         sdp: sdp,
       });
+
+      setTimeout(() => {
+        const track1 = pc.getTransceivers()[0].receiver.track;
+        const track2 = pc.getTransceivers()[1].receiver.track;
+        console.log(track1);
+        if (track1.kind === "video") {
+          setRemoteAudioTrack(track2);
+          setRemoteVideoTrack(track1);
+        } else {
+          setRemoteAudioTrack(track1);
+          setRemoteVideoTrack(track2);
+        }
+        //@ts-ignore
+        remoteVideoRef.current.srcObject.addTrack(track1);
+        //@ts-ignore
+        remoteVideoRef.current.srcObject.addTrack(track2);
+        //@ts-ignore
+        remoteVideoRef.current.play();
+        // if (type == 'audio') {
+        //     // setRemoteAudioTrack(track);
+        //     // @ts-ignore
+        //     remoteVideoRef.current.srcObject.addTrack(track)
+        // } else {
+        //     // setRemoteVideoTrack(track);
+        //     // @ts-ignore
+        //     remoteVideoRef.current.srcObject.addTrack(track)
+        // }
+        // //@ts-ignore
+      }, 5000);
     });
 
     socket.on("answer", ({ roomId, sdp: remoteSdp }) => {
