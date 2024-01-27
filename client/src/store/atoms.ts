@@ -55,3 +55,8 @@ export const localVideoTrackAtom = atom<MediaStreamTrack | null>({
   key: "localVideoTrackAtom",
   default: null,
 });
+
+export const localMediaStreamAtom = atom<MediaStream | null>({
+  key: "localMediaStreamAtom",
+  default: null,
+});
