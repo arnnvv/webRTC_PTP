@@ -1,9 +1,10 @@
 import { useRecoilState } from "recoil";
-import { nameAtom } from "../store/atoms";
+import { nameAtom, joinedLobbyAtom } from "../store/atoms";
 import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
   const [name, setName] = useRecoilState(nameAtom);
+  const [joinedLobby, setJoinedLobby] = useRecoilState(joinedLobbyAtom);
   const navigate = useNavigate();
   return (
     <div>

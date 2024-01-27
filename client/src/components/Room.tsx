@@ -16,7 +16,7 @@ const URL: string = "http://localhost:3000";
 const Room = () => {
   const name = useRecoilState(nameAtom);
   const [setSocket] = useRecoilState(socketAtom);
-  const [setLobby] = useRecoilState(lobbyAtom);
+  const [lobby, setLobby] = useRecoilState(lobbyAtom);
   const [sendingPc, setSendingPc] = useRecoilState(sendingPcAtom);
   const [receivingPc, setReceivingPc] = useRecoilState(receivingPcAtom);
   const [remoteVideoTrack, setRemoteVideoTrack] =
@@ -61,7 +61,14 @@ const Room = () => {
     });
 
     socket.on("answer", ({ roomId, answer }) => {
-      alert(`Connected`);
+      setLobby(false);
+      setSendingPc((pc) => {
+        pc?.setRemoteDescription({
+          type: "answer",
+          sdp: answer,
+        });
+        return pc;
+      });
     });
 
     socket.on("lobby", () => {
@@ -69,7 +76,16 @@ const Room = () => {
     });
     setSocket(socket);
   }, [name]);
-  return <>Hi {name}</>;
+  if (lobby) {
+    return <div>Waiting for others to join</div>;
+  }
+  return (
+    <div>
+      Hi {name}
+      <video width={400} height={400} />
+      <video width={400} height={400} />
+    </div>
+  );
 };
 
 export default Room;

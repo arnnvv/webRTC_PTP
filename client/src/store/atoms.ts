@@ -40,3 +40,8 @@ export const remoteMediaStreamAtom = atom<MediaStream | null>({
   key: "remoteMediaStreamAtom",
   default: null,
 });
+
+export const joinedLobbyAtom = atom({
+  key: "joinedLobbyAtom",
+  default: false,
+});
